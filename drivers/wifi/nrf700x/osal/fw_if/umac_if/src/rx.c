@@ -163,6 +163,9 @@ out:
 }
 
 
+int g_num_pkts=0;
+int g_count=0;
+
 enum wifi_nrf_status wifi_nrf_fmac_rx_event_process(struct wifi_nrf_fmac_dev_ctx *fmac_dev_ctx,
 						    struct nrf_wifi_rx_buff *config)
 {
@@ -185,6 +188,9 @@ enum wifi_nrf_status wifi_nrf_fmac_rx_event_process(struct wifi_nrf_fmac_dev_ctx
 	num_pkts = config->rx_pkt_cnt;
 
 	fmac_dev_ctx->host_stats.total_rx_pkts += num_pkts;
+
+	g_num_pkts += num_pkts;
+	g_count += 1;
 
 	for (i = 0; i < num_pkts; i++) {
 		desc_id = config->rx_buff_info[i].descriptor_id;
