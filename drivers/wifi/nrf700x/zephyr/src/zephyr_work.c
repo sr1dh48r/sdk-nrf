@@ -16,8 +16,7 @@
 
 #include "zephyr_work.h"
 
-#define PRIORITY 0
-#define CONFIG_NRF700X_WORKQ_MAX_ITEMS 10
+#define PRIORITY -15
 
 LOG_MODULE_DECLARE(wifi_nrf, CONFIG_WIFI_LOG_LEVEL);
 

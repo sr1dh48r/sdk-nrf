@@ -96,7 +96,7 @@ static bool is_eapol(struct net_pkt *pkt)
 
 enum ethernet_hw_caps wifi_nrf_if_caps_get(const struct device *dev)
 {
-	return (ETHERNET_LINK_10BASE_T | ETHERNET_LINK_100BASE_T | ETHERNET_LINK_1000BASE_T);
+	return (ETHERNET_LINK_10BASE_T | ETHERNET_LINK_100BASE_T | ETHERNET_LINK_1000BASE_T | ETHERNET_HW_RX_CHKSUM_OFFLOAD);
 }
 
 #ifdef CONFIG_TIMESTAMP_RX
