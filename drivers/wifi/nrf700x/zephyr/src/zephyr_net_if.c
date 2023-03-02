@@ -99,6 +99,29 @@ enum ethernet_hw_caps wifi_nrf_if_caps_get(const struct device *dev)
 	return (ETHERNET_LINK_10BASE_T | ETHERNET_LINK_100BASE_T | ETHERNET_LINK_1000BASE_T);
 }
 
+#ifdef CONFIG_TIMESTAMP_RX
+uint32_t start_time, stop_time;
+
+void tstamp(int pos)
+{
+	uint32_t cycles_spent, nanoseconds_spent;
+
+	/* capture final time stamp */
+	stop_time = k_cycle_get_32();
+
+	/* compute how long the work took (assumes no counter rollover) */
+	cycles_spent = stop_time - start_time;
+
+	nanoseconds_spent = (uint32_t)k_cyc_to_ns_floor64(cycles_spent);
+
+	if (pos != 0)
+		printk("%s : %d : timediff-us: %d (%d)\n", __func__, pos, nanoseconds_spent / 1000,
+		       nanoseconds_spent);
+
+	start_time = k_cycle_get_32();
+}
+#endif
+
 int wifi_nrf_if_send(const struct device *dev,
 		     struct net_pkt *pkt)
 {

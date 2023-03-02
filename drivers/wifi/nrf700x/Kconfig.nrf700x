@@ -113,4 +113,7 @@ config NRF700X_SCAN_LIMIT
 	int "Maximum number of scan results returned to application. Use negative values for unlimited scan results."
 	default -1
 
+config TIMESTAMP_RX
+	int "enable debug"
+	default 0
 endif

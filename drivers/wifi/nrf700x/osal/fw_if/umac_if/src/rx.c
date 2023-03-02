@@ -189,12 +189,19 @@ enum wifi_nrf_status wifi_nrf_fmac_rx_event_process(struct wifi_nrf_fmac_dev_ctx
 
 	fmac_dev_ctx->host_stats.total_rx_pkts += num_pkts;
 
-	g_num_pkts += num_pkts;
-	g_count += 1;
+	if (config->rx_pkt_type == NRF_WIFI_RX_PKT_DATA){
+		g_num_pkts += num_pkts;
+		g_count += 1;
+	}
 
 	for (i = 0; i < num_pkts; i++) {
 		desc_id = config->rx_buff_info[i].descriptor_id;
 		pkt_len = config->rx_buff_info[i].rx_pkt_len;
+
+		#if defined CONFIG_TIMESTAMP_RX && CONFIG_TIMESTAMP_RX > 0
+		if (pkt_len > CONFIG_TIMESTAMP_RX)
+			tstamp(1);
+		#endif
 
 		if (desc_id >= fmac_dev_ctx->fpriv->num_rx_bufs) {
 			wifi_nrf_osal_log_err(fmac_dev_ctx->fpriv->opriv,
@@ -289,8 +296,17 @@ enum wifi_nrf_status wifi_nrf_fmac_rx_event_process(struct wifi_nrf_fmac_dev_ctx
 				goto out;
 			}
 
+#if defined CONFIG_TIMESTAMP_RX && CONFIG_TIMESTAMP_RX > 0
+			if (pkt_len > CONFIG_TIMESTAMP_RX)
+			tstamp(2);
+#endif
+
 			fmac_dev_ctx->fpriv->callbk_fns.rx_frm_callbk_fn(vif_ctx->os_vif_ctx,
 									 nwb);
+#if defined CONFIG_TIMESTAMP_RX && CONFIG_TIMESTAMP_RX > 0
+			if (pkt_len > CONFIG_TIMESTAMP_RX)
+			tstamp(3);
+#endif
 		} else if (config->rx_pkt_type == NRF_WIFI_RX_PKT_BCN_PRB_RSP) {
 			wifi_nrf_osal_nbuf_free(fmac_dev_ctx->fpriv->opriv,
 						nwb);
@@ -306,6 +322,11 @@ enum wifi_nrf_status wifi_nrf_fmac_rx_event_process(struct wifi_nrf_fmac_dev_ctx
 		status = wifi_nrf_fmac_rx_cmd_send(fmac_dev_ctx,
 						   WIFI_NRF_FMAC_RX_CMD_TYPE_INIT,
 						   desc_id);
+
+#if defined CONFIG_TIMESTAMP_RX && CONFIG_TIMESTAMP_RX > 0
+		if (pkt_len > CONFIG_TIMESTAMP_RX)
+		tstamp(4);
+#endif
 
 		if (status != WIFI_NRF_STATUS_SUCCESS) {
 			wifi_nrf_osal_log_err(fmac_dev_ctx->fpriv->opriv,

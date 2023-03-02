@@ -639,6 +639,9 @@ static void zep_shim_irq_handler(const struct device *dev, struct gpio_callback 
 
 	intr_priv = (struct zep_shim_intr_priv *)cb;
 
+#if defined CONFIG_TIMESTAMP_RX && CONFIG_TIMESTAMP_RX > 0
+	tstamp(0);
+#endif
 	k_work_schedule_for_queue(&zep_wifi_drv_q, &intr_priv->work, K_NO_WAIT);
 }
 
