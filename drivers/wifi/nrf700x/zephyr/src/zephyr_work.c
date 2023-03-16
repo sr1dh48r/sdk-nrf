@@ -20,8 +20,11 @@
 
 LOG_MODULE_DECLARE(wifi_nrf, CONFIG_WIFI_LOG_LEVEL);
 
-K_THREAD_STACK_DEFINE(wq_stack_area, CONFIG_NRF700X_WORKQ_STACK_SIZE);
+K_THREAD_STACK_DEFINE(wq_stack_area, 1024);
 struct k_work_q zep_wifi_drv_q;
+
+K_THREAD_STACK_DEFINE(irq_stack_area, 1024);
+struct k_work_q zep_wifi_intr_q;
 
 struct zep_work_item zep_work_item[CONFIG_NRF700X_WORKQ_MAX_ITEMS];
 
@@ -68,8 +71,17 @@ static int workqueue_init(const struct device *unused)
 	k_work_queue_start(&zep_wifi_drv_q,
 						wq_stack_area,
 						K_THREAD_STACK_SIZEOF(wq_stack_area),
-						PRIORITY,
+						-14,
 						NULL);
+
+	k_work_queue_init(&zep_wifi_intr_q);
+
+	k_work_queue_start(&zep_wifi_intr_q,
+						irq_stack_area,
+						K_THREAD_STACK_SIZEOF(irq_stack_area),
+						-15,
+						NULL);
+
 	return 0;
 }
 
